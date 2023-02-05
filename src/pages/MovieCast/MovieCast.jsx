@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchCastByMovie, IMG_PATH } from 'components/Api/Api';
 import actorPlaceholder from '../../images/actor-placeholder.jpg';
+import { BtnToTop } from 'components/BtnToTop/BtnToTop';
+import { Loader } from 'components/Loader/Loader';
 import {
   Wrapper,
   MovieDetailsTitle,
@@ -10,7 +12,6 @@ import {
   MovieCastImg,
   MovieActorData,
 } from './MovieCast.styled';
-import { Loader } from 'components/Loader/Loader';
 
 const MovieCast = () => {
   const [castByMovie, setCastByMovie] = useState();
@@ -75,6 +76,7 @@ const MovieCast = () => {
           </p>
         )}
       </MovieCastList>
+      <BtnToTop />
       <Loader loading={loading} />
     </Wrapper>
   );

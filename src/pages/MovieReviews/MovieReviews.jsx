@@ -4,6 +4,7 @@ import { fetchReviewsByMovie } from 'components/Api/Api';
 import { MovieReviewsList, MovieReviewsItem } from './MovieReviews.styled';
 import { MovieDetailsTitle } from 'pages/MovieCast/MovieCast.styled';
 import { Wrapper } from 'pages/MovieCast/MovieCast.styled';
+import { BtnToTop } from 'components/BtnToTop/BtnToTop';
 import { Loader } from 'components/Loader/Loader';
 
 const MovieReviews = () => {
@@ -52,6 +53,7 @@ const MovieReviews = () => {
           </p>
         )}
       </MovieReviewsList>
+      <BtnToTop />
       <Loader loading={loading} />
     </Wrapper>
   );
