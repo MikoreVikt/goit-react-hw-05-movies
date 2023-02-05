@@ -1,4 +1,4 @@
-export const NotFound = () => {
+const NotFound = () => {
   return (
     <main style={{ padding: 100, textAlign: 'center' }}>
       <b style={{ fontSize: 60, marginBottom: 20, color: 'red' }}>404</b>
@@ -6,3 +6,5 @@ export const NotFound = () => {
     </main>
   );
 };
+
+export default NotFound;

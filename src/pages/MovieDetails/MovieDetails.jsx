@@ -2,26 +2,32 @@ import { useState, useEffect, Suspense } from 'react';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 import {
   GoBackLink,
+  MovieDetailsImg,
   MovieName,
   MovieUserScore,
   MovieDetailsTitle,
   MovieDetailsData,
 } from './MovieDetails.styled';
 import { StyledLink } from 'components/AppBar/AppBar.styled';
-import { fetchMovieInfo } from 'components/Api/Api';
-import { IMG_PATH } from 'components/Api/Api';
+import { fetchMovieDetails, IMG_PATH } from 'components/Api/Api';
+import { Loader } from 'components/Loader/Loader';
 
 const MovieDetails = () => {
   const [movieData, setMovieData] = useState({});
+  const [loading] = useState(true);
   const { movieId } = useParams();
-
   const location = useLocation();
 
   useEffect(() => {
-    fetchMovieInfo(movieId, '').then(setMovieData);
-    window.scrollTo({
-      top: 0,
-    });
+    (async function getFilmById() {
+      try {
+        const res = await fetchMovieDetails(movieId);
+        await setMovieData(res.data);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch {
+        console.log(`Oops! Something went wrong! Try again!`);
+      }
+    })();
   }, [movieId]);
 
   const {
@@ -36,12 +42,7 @@ const MovieDetails = () => {
   if (!release_date) return;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <>
       <GoBackLink to={location.state?.from ?? '/'}>Go back</GoBackLink>
       <div
         style={{
@@ -50,14 +51,13 @@ const MovieDetails = () => {
           marginBottom: '30px',
         }}
       >
-        <img src={IMG_PATH + poster_path} alt={original_title} width={300} />
-        <div style={{ marginLeft: '30px', maxWidth: '500px' }}>
+        <MovieDetailsImg src={IMG_PATH + poster_path} alt={original_title} />
+        <div style={{ maxWidth: '500px', marginLeft: '30px' }}>
           <MovieName>
-            {original_title + `(${new Date(release_date).getFullYear()})`}
+            {original_title + ` (${new Date(release_date).getFullYear()})`}
           </MovieName>
           <MovieUserScore>
-            <span>User score:</span>
-            {Math.round(vote_average * 10)}%
+            User score: {Math.round(vote_average * 10)}%
           </MovieUserScore>
           <MovieDetailsTitle>Overview</MovieDetailsTitle>
           <MovieDetailsData>{overview}</MovieDetailsData>
@@ -84,10 +84,10 @@ const MovieDetails = () => {
           </div>
         </div>
       </div>
-      <Suspense fallback={null}>
-        <Outlet context={[movieId]} />
+      <Suspense fallback={<Loader loading={loading} />}>
+        <Outlet />
       </Suspense>
-    </div>
+    </>
   );
 };
 

@@ -1,69 +1,82 @@
-import { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { fetchMovieInfo } from 'components/Api/Api';
-import { IMG_PATH } from 'components/Api/Api';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchCastByMovie, IMG_PATH } from 'components/Api/Api';
+import actorPlaceholder from '../../images/actor-placeholder.jpg';
 import {
   Wrapper,
+  MovieDetailsTitle,
   MovieCastList,
   MovieCastItem,
-  MovieDetailsTitle,
   MovieCastImg,
-  MovieCastWithOutImg,
   MovieActorData,
 } from './MovieCast.styled';
+import { Loader } from 'components/Loader/Loader';
 
 const MovieCast = () => {
-  const [movieId] = useOutletContext();
-  const [movieCredits, setMovieCredits] = useState(null);
+  const [castByMovie, setCastByMovie] = useState();
+  const [loading, setLoading] = useState(true);
+  const { movieId } = useParams();
 
   useEffect(() => {
-    fetchMovieInfo(movieId, 'credits').then(setMovieCredits);
+    (async function getCastByMovie() {
+      try {
+        const res = await fetchCastByMovie(movieId);
+        setCastByMovie(res.data.cast);
+        setLoading(false);
+      } catch {
+        console.log(`Ooops!`);
+      }
+    })();
   }, [movieId]);
 
   useEffect(() => {
-    setTimeout(() => {
-      window.scrollTo({
-        top: 600,
-        left: 0,
-        behavior: 'smooth',
-      });
-    }, 300);
-  }, [movieCredits]);
+    window.scrollTo({ top: 700, behavior: 'smooth' });
+  }, [castByMovie]);
 
-  if (!movieCredits) return;
+  if (!castByMovie) return;
 
   return (
-    <>
-      <Wrapper>
-        <MovieDetailsTitle>Cast</MovieDetailsTitle>
-        <MovieCastList>
-          {movieCredits.cast.length > 0 ? (
-            movieCredits.cast.map(
-              ({ id, profile_path, original_name, character }) => (
-                <MovieCastItem key={id}>
-                  {profile_path ? (
-                    <MovieCastImg
-                      src={IMG_PATH + profile_path}
-                      alt={original_name}
-                      width={200}
-                      height={250}
-                    />
-                  ) : (
-                    <MovieCastWithOutImg>Image not found</MovieCastWithOutImg>
-                  )}
-                  <MovieActorData>{original_name}</MovieActorData>
-                  <MovieActorData>
-                    Character: <span>{character}</span>
-                  </MovieActorData>
-                </MovieCastItem>
-              )
-            )
-          ) : (
-            <h4>We don't have any cast for this movie.</h4>
-          )}
-        </MovieCastList>
-      </Wrapper>
-    </>
+    <Wrapper>
+      <MovieDetailsTitle>Cast</MovieDetailsTitle>
+      <MovieCastList>
+        {castByMovie.length > 0 ? (
+          castByMovie.map(({ id, profile_path, original_name, character }) => (
+            <MovieCastItem key={id}>
+              {profile_path ? (
+                <MovieCastImg
+                  src={IMG_PATH + profile_path}
+                  alt={original_name}
+                  width={200}
+                  height={300}
+                />
+              ) : (
+                <MovieCastImg
+                  src={actorPlaceholder}
+                  alt={original_name}
+                  width={200}
+                  height={300}
+                />
+              )}
+              <MovieActorData>{original_name}</MovieActorData>
+              <MovieActorData>
+                Character: <span>{character}</span>
+              </MovieActorData>
+            </MovieCastItem>
+          ))
+        ) : (
+          <p
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              color: 'white',
+            }}
+          >
+            We don't have any casts for this movie!
+          </p>
+        )}
+      </MovieCastList>
+      <Loader loading={loading} />
+    </Wrapper>
   );
 };
 

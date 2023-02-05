@@ -1,49 +1,76 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Form, Input } from './MoviesSearch.styled';
-import { fetchMovieByName } from 'components/Api/Api';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { fetchBySearchMovie } from 'components/Api/Api';
+import { Loader } from 'components/Loader/Loader';
 import { MovieList } from 'components/MovieList/MovieList';
+import {
+  Wrapper,
+  SearchTitle,
+  SearchInput,
+  SearchForm,
+  SearchButton,
+} from './MoviesSearch.styled';
 
 const MoviesSearch = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState('');
-  const [searchMovies, setSearchMovies] = useState([]);
+  const [requestedMovies, setRequestedMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  let savedQuery = searchParams.get('query') ?? '';
+  const savedQuery = searchParams.get('query') ?? '';
 
   useEffect(() => {
     if (!savedQuery) {
-      setSearchMovies([]);
+      setRequestedMovies([]);
+      setLoading(false);
       return;
     }
-    fetchMovieByName(savedQuery).then(res => setSearchMovies(res.results));
+    (async function getSearchQuery() {
+      try {
+        const res = await fetchBySearchMovie(savedQuery);
+        await setRequestedMovies(res.data.results);
+        await setLoading(false);
+      } catch {
+        console.log('Oops! Something went wrong! Try again!');
+      }
+    })();
   }, [savedQuery]);
 
   const handleSubmit = e => {
     e.preventDefault();
-
+    setLoading(true);
     if (!query.trim() || savedQuery === query.trim().toLowerCase()) {
       setQuery('');
+      setLoading(false);
       return;
     }
-
     setSearchParams({ query: query.trim().toLowerCase() });
     setQuery('');
   };
 
   return (
     <>
-      <Form onSubmit={handleSubmit}>
-        <Input
-          onChange={e => setQuery(e.currentTarget.value)}
-          value={query}
-          name="search"
-          type="text"
-        />
-        <button type="submit">Search</button>
-      </Form>
-
-      <MovieList moviesArr={searchMovies} />
+      <Wrapper>
+        <SearchTitle>Movie search</SearchTitle>
+        <SearchForm onSubmit={handleSubmit}>
+          <SearchInput
+            onChange={e => {
+              setQuery(e.target.value);
+            }}
+            value={query}
+            type="text"
+            autoComplete="off"
+            autoFocus
+            placeholder="Enter a search query"
+          />
+          <SearchButton type="submit">
+            <AiOutlineSearch />
+          </SearchButton>
+        </SearchForm>
+      </Wrapper>
+      <MovieList moviesArr={requestedMovies} />
+      <Loader loading={loading} />
     </>
   );
 };

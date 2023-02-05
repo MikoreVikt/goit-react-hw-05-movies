@@ -11,6 +11,7 @@ export const MovieDetailsTitle = styled.h2`
   text-transform: uppercase;
   text-align: center;
   margin-bottom: 30px;
+  color: white;
 `;
 
 export const MovieCastList = styled.ul`
@@ -28,7 +29,9 @@ export const MovieCastItem = styled.li`
   color: white;
   list-style: none;
   width: 200px;
-  background-color: #940000ba;
+  background-color: #740101ba;
+  box-shadow: inset 0 0 30px 1px rgb(0 0 0 / 75%),
+    0 11px 9px -5px rgb(0 0 0 / 75%);
   border-radius: 5px;
   overflow: hidden;
   transition: all 250ms linear;
@@ -44,20 +47,8 @@ export const MovieCastImg = styled.img`
   object-fit: cover;
 `;
 
-export const MovieCastWithOutImg = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 200px;
-  height: 250px;
-  font-weight: 700;
-  font-size: 20px;
-  color: black;
-  background-color: #dddddd;
-`;
-
 export const MovieActorData = styled.p`
-  padding: 5px 5px;
+  padding: 7px 5px;
   font-size: 15px;
   font-weight: 700;
   text-align: center;

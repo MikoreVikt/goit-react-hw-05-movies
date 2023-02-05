@@ -12,7 +12,9 @@ export const MovieUl = styled.ul`
 
 export const MovieItem = styled.li`
   width: 240px;
-  background-color: #940000ba;
+  background-color: #740101ba;
+  box-shadow: inset 0 0 30px 1px rgb(0 0 0 / 75%),
+    0 11px 9px -5px rgb(0 0 0 / 75%);
   border-radius: 5px;
   overflow: hidden;
   transition: scale 250ms linear, box-shadow 250ms linear;

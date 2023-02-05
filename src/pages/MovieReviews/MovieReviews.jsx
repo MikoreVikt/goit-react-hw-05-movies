@@ -1,53 +1,58 @@
-import { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { fetchMovieInfo } from 'components/Api/Api';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchReviewsByMovie } from 'components/Api/Api';
+import { MovieReviewsList, MovieReviewsItem } from './MovieReviews.styled';
 import { MovieDetailsTitle } from 'pages/MovieCast/MovieCast.styled';
-import { MovieReviewsItem, MovieReviewsList } from './MovieReviews.styled';
 import { Wrapper } from 'pages/MovieCast/MovieCast.styled';
+import { Loader } from 'components/Loader/Loader';
 
 const MovieReviews = () => {
-  const [movieId] = useOutletContext();
-  const [movieReviews, setMovieReviews] = useState(null);
+  const [reviewsByMovie, setReviewsByMovie] = useState();
+  const [loading, setLoading] = useState(true);
+  const { movieId } = useParams();
 
   useEffect(() => {
-    fetchMovieInfo(movieId, 'reviews').then(res =>
-      setMovieReviews(res.results)
-    );
+    (async function getReviewsByMovie() {
+      try {
+        const res = await fetchReviewsByMovie(movieId);
+        await setReviewsByMovie(res.data.results);
+        await await setLoading(false);
+      } catch {
+        console.log(`Ooops!`);
+      }
+    })();
   }, [movieId]);
 
   useEffect(() => {
-    setTimeout(() => {
-      window.scrollTo({
-        top: 600,
-        left: 0,
-        behavior: 'smooth',
-      });
-    }, 500);
-  }, [movieReviews]);
+    window.scrollTo({ top: 700, behavior: 'smooth' });
+  }, [reviewsByMovie]);
 
-  if (!movieReviews) return;
+  if (!reviewsByMovie) return;
 
   return (
     <Wrapper>
       <MovieDetailsTitle>Reviews</MovieDetailsTitle>
       <MovieReviewsList>
-        {movieReviews.length > 0 ? (
-          movieReviews.map(review => (
-            <MovieReviewsItem key={review.id}>
-              <h3
-                style={{
-                  marginBottom: '10px',
-                }}
-              >
-                Author:{review.author}
-              </h3>
-              <p>{review.content}</p>
+        {reviewsByMovie.length > 0 ? (
+          reviewsByMovie.map(({ id, author, content }) => (
+            <MovieReviewsItem key={id}>
+              <h3>{author}</h3>
+              <p>{content}</p>
             </MovieReviewsItem>
           ))
         ) : (
-          <p>We don't have any reviews for this movie.</p>
+          <p
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              color: 'white',
+            }}
+          >
+            We don't have any reviews for this movie!
+          </p>
         )}
       </MovieReviewsList>
+      <Loader loading={loading} />
     </Wrapper>
   );
 };
