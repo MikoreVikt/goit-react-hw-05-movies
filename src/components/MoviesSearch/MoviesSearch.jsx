@@ -41,7 +41,6 @@ const MoviesSearch = () => {
     e.preventDefault();
     setLoading(true);
     if (!query.trim() || savedQuery === query.trim().toLowerCase()) {
-      setQuery('');
       setLoading(false);
       return;
     }
