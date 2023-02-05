@@ -18,4 +18,4 @@ export const fetchReviewsByMovie = async movieId =>
   await axios.get(`movie/${movieId}/reviews?api_key=${API_KEY}&page=1`);
 
 export const fetchBySearchMovie = async query =>
-  await axios.get(`search/movie/?api_key=${API_KEY}&query=${query}&page=1`);
+  await axios.get(`search/movie?api_key=${API_KEY}&query=${query}&page=1`);
